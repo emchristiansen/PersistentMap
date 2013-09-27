@@ -21,10 +21,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     val database = {
       val tempFile = File.createTempFile("testPersistentMapDB", "sqlite")
       Database.forURL(s"jdbc:sqlite:$tempFile", driver = "org.sqlite.JDBC")
-//      Database.forURL(s"jdbc:sqlite::memory", driver = "org.sqlite.JDBC")
     }
-    //    val database = Database.forURL("jdbc:h2:db.h2", driver = "org.h2.Driver")
-    //    val database = Database.forURL("jdbc:mariadb://localhost:3306/test", driver = "org.mariadb.jdbc.Driver")
 
     val map = PersistentMap.create[MyKey, MyValue]("test", database)
 

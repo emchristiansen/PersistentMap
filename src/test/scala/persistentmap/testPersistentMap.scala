@@ -10,18 +10,28 @@ import scala.pickling.binary._
 import scala.slick.session.Database
 import java.io.File
 
-////////////////////////////////////////////////////////////////////////////////
-
 case class MyKey(a: Int, b: String)
 case class MyValue(a: MyKey, b: Double)
 
+class Base(val y: Int)
+case class Derived(val x: Int) extends Base(x)
+
 @RunWith(classOf[JUnitRunner])
 class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
-  test("acts like a map") {
-    val database = {
-      val tempFile = File.createTempFile("testPersistentMapDB", "sqlite")
-      Database.forURL(s"jdbc:sqlite:$tempFile", driver = "org.sqlite.JDBC")
-    }
+  // Creates a MySQL database, backed by some random temporary file.
+  def createDatabase = {
+    val tempFile = File.createTempFile("testPersistentMapDB", "sqlite")
+    Database.forURL(s"jdbc:sqlite:$tempFile", driver = "org.sqlite.JDBC")
+  }
+
+  test("sample code") {
+    val database: scala.slick.session.Database = createDatabase
+    
+    
+  }
+  
+  test("test the core Map api with sample data") {
+    val database = createDatabase
 
     val map = PersistentMap.create[MyKey, MyValue]("test", database)
 
@@ -69,15 +79,38 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     assert(map == map2)
   }
 
-  test("a vanilla unit test") {
-    val x = 1
-    assert(x == 1)
+  // We ensure we can't connect to a table with the wrong type of data.
+  test("basic table connection time type safety") {
+    val database = createDatabase
+
+    PersistentMap.create[Int, Double]("test", database)
+
+    // A `Double` is not a `String`, so this should fail to connect.
+    intercept[TableTypeException] {
+      PersistentMap.connect[Int, String]("test", database)
+    }
+
+    // Do a similar test with the key.
+    intercept[TableTypeException] {
+      PersistentMap.connect[String, Double]("test", database)
+    }
+
+    // For the sake of paranoia, make sure we can connect with the proper type.
+    PersistentMap.connect[Int, Double]("test", database)
   }
 
-  test("a generator driven test") {
-    val evenInts = for (n <- Gen.choose(-1000, 1000)) yield 2 * n
-    forAll(evenInts) { x =>
-      assert(x % 2 == 0)
-    }
+  // We extract a base class from a `PersistentMap` of a derived class.
+  test("table connection time type safety with subclasses") {
+    val database = createDatabase
+
+    val map1 = PersistentMap.create[Int, Derived]("test", database)
+    map1 += 42 -> Derived(10)
+
+    val map2 = PersistentMap.connect[Int, Derived]("test", database).get
+    assert(map1 == map2)
+    
+    // Retrieve the base type from a map with the derived type.
+    val map3 = PersistentMap.connect[Int, Base]("test", database).get
+    assert((map1(42): Base).y == map3(42).y)
   }
 }

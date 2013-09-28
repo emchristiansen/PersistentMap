@@ -27,7 +27,20 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   test("sample code") {
     val database: scala.slick.session.Database = createDatabase
     
+    // Create a `PersistentMap`.
+    val map = PersistentMap.create[Int, String]("myMap", database)
     
+    // Add key-value pairs.
+    map += 1 -> "no"
+    map += 2 -> "boilerplate"
+    
+    // Retrieve values.
+    assert(map(1) == "no")
+    
+    // Delete key-value pairs.
+    map -= 2
+    
+    // And do anything else supported by `collection.mutable.Map`.
   }
   
   test("test the core Map api with sample data") {

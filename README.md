@@ -6,6 +6,7 @@ You use a `PersistentMap` just like a regular mutable `Map`, and all changes to 
 
 Here's an example:
 
+```scala
     import scala.pickling._
     import scala.pickling.binary._
     import scala.slick.session.Database
@@ -28,6 +29,7 @@ Here's an example:
     map -= 2
     
     // And do anything else supported by `collection.mutable.Map`.
+```
 
 See the tests for more details.
 

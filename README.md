@@ -7,28 +7,28 @@ You use a `PersistentMap` just like a regular mutable `Map`, and all changes to 
 Here's an example:
 
 ```scala
-    import scala.pickling._
-    import scala.pickling.binary._
-    import scala.slick.session.Database
-    import persistentmap._
+import scala.pickling._
+import scala.pickling.binary._
+import scala.slick.session.Database
+import persistentmap._
 
-    val database: scala.slick.session.Database = ...
+val database: scala.slick.session.Database = ...
     
-    // Create a `PersistentMap`.
-    // Of course, you can also connect to an existing one.
-    val map = PersistentMap.create[Int, String]("myMap", database)
+// Create a `PersistentMap`.
+// Of course, you can also connect to an existing one.
+val map = PersistentMap.create[Int, String]("myMap", database)
     
-    // Add key-value pairs.
-    map += 1 -> "no"
-    map += 2 -> "boilerplate"
+// Add key-value pairs.
+map += 1 -> "no"
+map += 2 -> "boilerplate"
     
-    // Retrieve values.
-    assert(map(1) == "no")
+// Retrieve values.
+assert(map(1) == "no")
     
-    // Delete key-value pairs.
-    map -= 2
+// Delete key-value pairs.
+map -= 2
     
-    // And do anything else supported by `collection.mutable.Map`.
+// And do anything else supported by `collection.mutable.Map`.
 ```
 
 See the tests for more details.

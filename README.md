@@ -1,5 +1,3 @@
-travis
-
 PersistentMap
 =============
 
@@ -39,6 +37,8 @@ Installation
 
 This project is new, and so not yet on Sonatype.
 You must currently do a `git clone` and an `sbt publish-local`.
+
+[![Build Status](https://travis-ci.org/emchristiansen/PersistentMap.png)](https://travis-ci.org/emchristiansen/PersistentMap)
 
 A bit of commentary
 ===================

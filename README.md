@@ -32,6 +32,12 @@ Here's an example:
 
 See the tests for more details.
 
+Installation
+============
+
+This project is new, and so not yet on Sonatype.
+You must currently do a `git clone` and an `sbt publish-local`.
+
 A bit of commentary
 ===================
 

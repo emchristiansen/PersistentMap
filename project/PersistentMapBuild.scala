@@ -52,7 +52,6 @@ object PersistentMapBuild extends Build {
 
   def extraLibraryDependencies = Seq(
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersionString,
       "org.scala-lang" % "scala-compiler" % scalaVersionString,
       "com.typesafe.slick" %% "slick" % "1.0.1",
       "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT",

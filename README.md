@@ -10,7 +10,7 @@ Here's an example:
 import scala.pickling._
 import scala.pickling.binary._
 import scala.slick.session.Database
-import persistentmap._
+import st.sparse.persistentmap._
 
 val database: scala.slick.session.Database = ...
     
@@ -31,7 +31,7 @@ map -= 2
 // And do anything else supported by `collection.mutable.Map`.
 ```
 
-See the tests for more details.
+Please also see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests for more details.
 
 ##Installation
 

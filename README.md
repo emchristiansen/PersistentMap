@@ -35,8 +35,17 @@ Please also see the [simple example project](http://github.com/emchristiansen/Pe
 
 ##Installation
 
-This project is new, and so not yet on Sonatype.
-You must currently do a `git clone` and an `sbt publish-local`.
+You can use PersistentMap in your SBT project by simply adding the following dependency to your build file:
+
+```scala
+libraryDependencies += "st.sparse" %% "persistent-map" % "0.1-SNAPSHOT"
+```
+
+You also need to add the Sonatype "snapshots" repository resolver to your build file:
+
+```scala
+resolvers += Resolver.sonatypeRepo("snapshots")
+```
 
 [![Build Status](https://travis-ci.org/emchristiansen/PersistentMap.png)](https://travis-ci.org/emchristiansen/PersistentMap)
 

@@ -8,9 +8,10 @@ object PersistentMapBuild extends Build {
       "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"))
 
   val projectName = "PersistentMap"
+  val mavenName = "persistent-map"
 
   val publishSettings = Seq(
-    name := projectName,
+    name := mavenName,
 
     version := "0.1-SNAPSHOT",
 

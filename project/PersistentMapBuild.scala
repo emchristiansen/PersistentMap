@@ -55,6 +55,8 @@ object PersistentMapBuild extends Build {
       "org.scala-lang" % "scala-compiler" % scalaVersionString,
       "com.typesafe.slick" %% "slick" % "1.0.1",
       "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT",
+      "joda-time" % "joda-time" % "2.3",
+      "org.joda" % "joda-convert" % "1.5",
       "org.xerial" % "sqlite-jdbc" % "3.7.2" % "test",
       "org.slf4j" % "slf4j-nop" % "1.6.4" % "test",
       "org.scalatest" %% "scalatest" % "2.0.M5b" % "test",

@@ -11,6 +11,9 @@ import scala.pickling._
 import scala.pickling.binary._
 import scala.slick.session.Database
 import st.sparse.persistentmap._
+// Optionally include workarounds for a few cases where scala-pickling
+// currently fails.
+// import CustomPicklers._
 
 val database: scala.slick.session.Database = ...
     

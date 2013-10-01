@@ -177,7 +177,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
 
   override def -=(key: A): this.type = {
     database withSession { implicit session: Session =>
-      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)}".first
+      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = ${key.pickle.value}".first
     }
 
     this

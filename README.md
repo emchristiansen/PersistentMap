@@ -70,6 +70,8 @@ I hope a serious database project, e.g. Slick, picks up the idea.
 If you're on Mountain Lion, you'll have to use a different database.
 I've had luck with MariaDB.
 * The table typechecking currently uses runtime reflection, which has documented thread safety issues.
+For this reason, table typechecking currently lives in a synchronized block.
+Hopefully this solves the issue, though in my experience unexpected things can happen with concurrent runtime reflection.
 
 ##License
 

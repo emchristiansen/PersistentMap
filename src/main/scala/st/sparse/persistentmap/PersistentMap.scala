@@ -80,7 +80,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
     // The type table:
     // 1) must exist,
     require(MTable.getTables(typeTableName).list().size == 1)
-    val entries = sql"select * from #$typeTableName".as[TypeRecord].list
+    val entries = sql"select * from #$typeTableName;".as[TypeRecord].list
     // 2) must have exactly one entry,
     require(entries.size == 1)
 
@@ -136,7 +136,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       // We look up the key-value pair using the key's hash code.
       // This may have false positives.
       val keyHashHits =
-        sql"select * from #$recordsTableName where keyHash = ${hashKey(key)}".
+        sql"select * from #$recordsTableName where keyHash = ${hashKey(key)};".
           as[KeyValueRecord[A, B]].list
 
       // Here we weed out the false positives.
@@ -155,7 +155,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       // TODO: Make this a proper enumerator by either using a newer
       // version of Slick or by using the workaround described here:
       // http://stackoverflow.com/questions/16728545/nullpointerexception-when-plain-sql-and-string-interpolation
-      sql"select * from #$recordsTableName".as[KeyValueRecord[A, B]].list.
+      sql"select * from #$recordsTableName;".as[KeyValueRecord[A, B]].list.
         toIterator map {
           record => (record.key, record.value)
         }
@@ -169,7 +169,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       this -= key
 
       // Then we insert our new record.
-      sqlu"insert into #$recordsTableName values(${hashKey(key)}, ${key.pickle.value}, ${value.pickle.value})".first
+      sqlu"insert into #$recordsTableName values(${hashKey(key)}, ${key.pickle.value}, ${value.pickle.value});".first
     }
 
     this
@@ -177,7 +177,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
 
   override def -=(key: A): this.type = {
     database withSession { implicit session: Session =>
-      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = ${key.pickle.value}".first
+      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = ${key.pickle.value};".first
     }
 
     this
@@ -209,28 +209,28 @@ object PersistentMap {
     database withSession { implicit session: Session =>
       // Initialize the type table.      
       if (!MTable.getTables(typeTableName).elements.isEmpty)
-        sqlu"drop table #$typeTableName".first
+        sqlu"drop table #$typeTableName;".first
 
-      sqlu"create table #$typeTableName(keyType text not null, valueType text not null)".first
+      sqlu"create table #$typeTableName(keyType text not null, valueType text not null);".first
 
       val aString = implicitly[FastTypeTag[A]].tpe.toString
       val bString = implicitly[FastTypeTag[B]].tpe.toString
-      sqlu"insert into #$typeTableName values($aString, $bString)".first
+      sqlu"insert into #$typeTableName values($aString, $bString);".first
 
       // Initialize the records table.
       if (!MTable.getTables(recordsTableName).elements.isEmpty) {
         // We assume the index also exists, so we delete it as well.
         // In fact, we delete it first, otherwise it would be dangling at some
         // point, and something crazy might happen.
-        sqlu"drop index #$recordsTableIndexName".first
-        sqlu"drop table #$recordsTableName".first
+        sqlu"drop index #$recordsTableIndexName;".first
+        sqlu"drop table #$recordsTableName;".first
       }
 
       // We want to do quick lookups using the key hash, but we can't make it
       // a primary key due to the possibility of hash collisions.
       // Instead, we build an index on the key hash.
-      sqlu"create table #$recordsTableName(keyHash int not null, keyData blob not null, valueData blob not null)".first
-      sqlu"create index #$recordsTableIndexName on #$recordsTableName(keyHash)".first
+      sqlu"create table #$recordsTableName(keyHash int not null, keyData blob not null, valueData blob not null);".first
+      sqlu"create index #$recordsTableIndexName on #$recordsTableName(keyHash);".first
     }
 
     // Build the final map.

@@ -29,7 +29,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     "jdbc:mysql://localhost/myapp_test?user=travis&password=",
     driver = "com.mysql.jdbc.Driver")
 
-  test("sample code") {
+  test("SQLite: sample code") {
     val database: scala.slick.session.Database = createSQLiteDatabase
 
     // Create a `PersistentMap`.
@@ -48,96 +48,105 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     // And do anything else supported by `collection.mutable.Map`.
   }
 
-  test("test the core Map api with sample data") {
-    def run(database: Database) = {
-      val map = PersistentMap.create[MyKey, MyValue]("test", database)
+  def run0(database: Database) = {
+    val map = PersistentMap.create[MyKey, MyValue]("test", database)
 
-      val key1 = MyKey(1, "one")
-      val key2 = MyKey(2, "two")
+    val key1 = MyKey(1, "one")
+    val key2 = MyKey(2, "two")
 
-      val value1 = MyValue(key1, 1.0)
-      val value2 = MyValue(key2, 2.0)
+    val value1 = MyValue(key1, 1.0)
+    val value2 = MyValue(key2, 2.0)
 
-      val kv11 = key1 -> value1
-      val kv22 = key2 -> value2
-      val kv12 = key1 -> value2
+    val kv11 = key1 -> value1
+    val kv22 = key2 -> value2
+    val kv12 = key1 -> value2
 
-      assert(map.get(key1) == None)
-      assert(map.get(key2) == None)
-      assert(map.toSet == Set())
+    assert(map.get(key1) == None)
+    assert(map.get(key2) == None)
+    assert(map.toSet == Set())
 
-      map += kv11
+    map += kv11
 
-      assert(map.get(key1) == Some(value1))
-      assert(map.get(key2) == None)
-      assert(map.toSet == Set(kv11))
+    assert(map.get(key1) == Some(value1))
+    assert(map.get(key2) == None)
+    assert(map.toSet == Set(kv11))
 
-      map += kv22
+    map += kv22
 
-      assert(map.get(key1) == Some(value1))
-      assert(map.get(key2) == Some(value2))
-      assert(map.toSet == Set(kv11, kv22))
+    assert(map.get(key1) == Some(value1))
+    assert(map.get(key2) == Some(value2))
+    assert(map.toSet == Set(kv11, kv22))
 
-      map -= key1
+    map -= key1
 
-      assert(map.get(key1) == None)
-      assert(map.get(key2) == Some(value2))
-      assert(map.toSet == Set(kv22))
+    assert(map.get(key1) == None)
+    assert(map.get(key2) == Some(value2))
+    assert(map.toSet == Set(kv22))
 
-      map += kv12
+    map += kv12
 
-      assert(map.get(key1) == Some(value2))
-      assert(map.get(key2) == Some(value2))
-      assert(map.toSet == Set(kv12, kv22))
+    assert(map.get(key1) == Some(value2))
+    assert(map.get(key2) == Some(value2))
+    assert(map.toSet == Set(kv12, kv22))
 
-      // Now let's make sure this map is really persistent.
-      val map2 = PersistentMap.connect[MyKey, MyValue]("test", database).get
+    // Now let's make sure this map is really persistent.
+    val map2 = PersistentMap.connect[MyKey, MyValue]("test", database).get
 
-      assert(map == map2)
+    assert(map == map2)
+  }
+
+  test("SQLite: test the core Map api with sample data") {
+    run0(createSQLiteDatabase)
+  }
+
+  test("MySQL: test the core Map api with sample data") {
+    run0(createMySQLDatabase)
+  }
+  
+  def run1(database: Database) {
+    PersistentMap.create[Int, Double]("test", database)
+
+    // A `Double` is not a `String`, so this should fail to connect.
+    intercept[TableTypeException] {
+      PersistentMap.connect[Int, String]("test", database)
     }
 
-    run(createSQLiteDatabase)
-    run(createMySQLDatabase)
+    // Do a similar test with the key.
+    intercept[TableTypeException] {
+      PersistentMap.connect[String, Double]("test", database)
+    }
+
+    // For the sake of paranoia, make sure we can connect with the proper type.
+    PersistentMap.connect[Int, Double]("test", database)
   }
 
   // We ensure we can't connect to a table with the wrong type of data.
-  test("basic table connection time type safety") {
-    def run(database: Database) {
-      PersistentMap.create[Int, Double]("test", database)
+  test("SQLite: basic table connection time type safety") {
+    run1(createSQLiteDatabase)
+  }
+  
+  test("MySQL: basic table connection time type safety") {
+    run1(createMySQLDatabase)
+  }
 
-      // A `Double` is not a `String`, so this should fail to connect.
-      intercept[TableTypeException] {
-        PersistentMap.connect[Int, String]("test", database)
-      }
+  def run2(database: Database) {
+    val map1 = PersistentMap.create[Int, Derived]("test", database)
+    map1 += 42 -> Derived(10)
 
-      // Do a similar test with the key.
-      intercept[TableTypeException] {
-        PersistentMap.connect[String, Double]("test", database)
-      }
+    val map2 = PersistentMap.connect[Int, Derived]("test", database).get
+    assert(map1 == map2)
 
-      // For the sake of paranoia, make sure we can connect with the proper type.
-      PersistentMap.connect[Int, Double]("test", database)
-    }
-
-    run(createSQLiteDatabase)
-    run(createMySQLDatabase)
+    // Retrieve the base type from a map with the derived type.
+    val map3 = PersistentMap.connect[Int, Base]("test", database).get
+    assert((map1(42): Base).y == map3(42).y)
   }
 
   // We extract a base class from a `PersistentMap` of a derived class.
-  test("table connection time type safety with subclasses") {
-    def run(database: Database) {
-      val map1 = PersistentMap.create[Int, Derived]("test", database)
-      map1 += 42 -> Derived(10)
-
-      val map2 = PersistentMap.connect[Int, Derived]("test", database).get
-      assert(map1 == map2)
-
-      // Retrieve the base type from a map with the derived type.
-      val map3 = PersistentMap.connect[Int, Base]("test", database).get
-      assert((map1(42): Base).y == map3(42).y)
-    }
-    
-    run(createSQLiteDatabase)
-    run(createMySQLDatabase)
+  test("SQLite: table connection time type safety with subclasses") {
+    run2(createSQLiteDatabase)
+  }
+  
+  test("MySQL: table connection time type safety with subclasses") {
+    run2(createMySQLDatabase)
   }
 }

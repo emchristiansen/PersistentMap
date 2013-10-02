@@ -26,7 +26,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
 
   // This will only work in a Travis CI environment.
   def createMySQLDatabase = Database.forURL(
-    "jdbc:mysql://localhost/myapp_test?user=travis@password=",
+    "jdbc:mysql://localhost/myapp_test?user=\"travis\"&password=\"\"",
     driver = "com.mysql.jdbc.Driver")
 
   test("sample code") {

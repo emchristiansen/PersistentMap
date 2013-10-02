@@ -102,36 +102,42 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
 
   // We ensure we can't connect to a table with the wrong type of data.
   test("basic table connection time type safety") {
-    val database = createSQLiteDatabase
+    def run(database: Database) {
+      PersistentMap.create[Int, Double]("test", database)
 
-    PersistentMap.create[Int, Double]("test", database)
+      // A `Double` is not a `String`, so this should fail to connect.
+      intercept[TableTypeException] {
+        PersistentMap.connect[Int, String]("test", database)
+      }
 
-    // A `Double` is not a `String`, so this should fail to connect.
-    intercept[TableTypeException] {
-      PersistentMap.connect[Int, String]("test", database)
+      // Do a similar test with the key.
+      intercept[TableTypeException] {
+        PersistentMap.connect[String, Double]("test", database)
+      }
+
+      // For the sake of paranoia, make sure we can connect with the proper type.
+      PersistentMap.connect[Int, Double]("test", database)
     }
 
-    // Do a similar test with the key.
-    intercept[TableTypeException] {
-      PersistentMap.connect[String, Double]("test", database)
-    }
-
-    // For the sake of paranoia, make sure we can connect with the proper type.
-    PersistentMap.connect[Int, Double]("test", database)
+    run(createSQLiteDatabase)
+    run(createMySQLDatabase)
   }
 
   // We extract a base class from a `PersistentMap` of a derived class.
   test("table connection time type safety with subclasses") {
-    val database = createSQLiteDatabase
+    def run(database: Database) {
+      val map1 = PersistentMap.create[Int, Derived]("test", database)
+      map1 += 42 -> Derived(10)
 
-    val map1 = PersistentMap.create[Int, Derived]("test", database)
-    map1 += 42 -> Derived(10)
+      val map2 = PersistentMap.connect[Int, Derived]("test", database).get
+      assert(map1 == map2)
 
-    val map2 = PersistentMap.connect[Int, Derived]("test", database).get
-    assert(map1 == map2)
-
-    // Retrieve the base type from a map with the derived type.
-    val map3 = PersistentMap.connect[Int, Base]("test", database).get
-    assert((map1(42): Base).y == map3(42).y)
+      // Retrieve the base type from a map with the derived type.
+      val map3 = PersistentMap.connect[Int, Base]("test", database).get
+      assert((map1(42): Base).y == map3(42).y)
+    }
+    
+    run(createSQLiteDatabase)
+    run(createMySQLDatabase)
   }
 }

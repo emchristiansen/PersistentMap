@@ -25,9 +25,9 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   // This will only work in a Travis CI environment.
-  def createMySQLDatabase = {
-    Database.forURL("jdbc:mysql://localhost/myapp_test?user=travis@password=")
-  }
+  def createMySQLDatabase = Database.forURL(
+    "jdbc:mysql://localhost/myapp_test?user=travis@password=",
+    driver = "com.mysql.jdbc.Driver")
 
   test("sample code") {
     val database: scala.slick.session.Database = createSQLiteDatabase
@@ -95,7 +95,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
 
       assert(map == map2)
     }
-    
+
     run(createSQLiteDatabase)
     run(createMySQLDatabase)
   }

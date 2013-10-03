@@ -1,6 +1,7 @@
 #PersistentMap
 
 PersistentMap is a type-safe, boilerplate-free, key-value store, built on top of [Slick](http://slick.typesafe.com/) and [scala-pickling](https://github.com/scala/pickling).
+Unlike existing key-value stores, it does not require the user to manually specify the database schema; instead, serialization is done automatically using scala-pickling.
 It exposes a new type, `PersistentMap[A, B]`, which extends `collection.mutable.Map[A, B]`.
 You use a `PersistentMap` just like a regular mutable `Map`, and all changes to its state are automatically propagated to an underlying database.
 
@@ -32,9 +33,23 @@ assert(map(1) == "no")
 map -= 2
     
 // And do anything else supported by `collection.mutable.Map`.
+...
+
+// You can use arbitrary types in the store, so long as scala-pickling
+// can handle them.
+
+case class Foo(int: Int)
+case class Bar(foos: List[Foo], string: String)
+
+val otherMap = PersistentMap.create[Foo, Bar]("myOtherMap", database)
+  
+otherMap += Foo(10) -> Bar(List(Foo(1), Foo(2)), "hello")
 ```
 
-Please also see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests for more details.
+As demonstrated in the above code, scala-pickling can handle existing case classes, but it is by no means limited to that.
+See Heather Miller's [talk](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a/chapter0/about) ([slides](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a/chapter0/about)) for more information.
+
+For more detailed information on using PersistentMap, see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests.
 
 ##Installation
 

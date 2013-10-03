@@ -69,6 +69,8 @@ I hope a serious database project, e.g. Slick, picks up the idea.
 * `org.xerial % sqlite-jdbc` is broken in OS X Mountain Lion, so the tests as written will fail in that OS.
 If you're on Mountain Lion, you'll have to use a different database.
 I've had luck with MariaDB.
+* Unless you have MySQL set up the way Travis CI expects, the MySQL tests will fail.
+Travis CI's MySQL environment is explained here: http://about.travis-ci.org/docs/user/database-setup/.
 * The table typechecking currently uses runtime reflection, which has documented thread safety issues.
 
 ##License

@@ -226,7 +226,7 @@ object PersistentMap {
         // We assume the index also exists, so we delete it as well.
         // In fact, we delete it first, otherwise it would be dangling at some
         // point, and something crazy might happen.
-        sqlu"drop index #$recordsTableIndexName;".first
+        sqlu"drop index #$recordsTableIndexName on #$recordsTableName;".first
         sqlu"drop table #$recordsTableName;".first
       }
 

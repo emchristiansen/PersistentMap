@@ -211,7 +211,7 @@ object PersistentMap {
       if (!MTable.getTables(typeTableName).elements.isEmpty)
         sqlu"drop table #$typeTableName;".first
 
-      sqlu"create table #$typeTableName(keyType text not null, valueType text not null);".first
+      sqlu"create table #$typeTableName(keyType varchar(10000) not null, valueType varchar(10000) not null);".first
 
       val aString = implicitly[FastTypeTag[A]].tpe.toString
       val bString = implicitly[FastTypeTag[B]].tpe.toString

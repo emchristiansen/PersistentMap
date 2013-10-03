@@ -211,6 +211,10 @@ object PersistentMap {
       if (!MTable.getTables(typeTableName).elements.isEmpty)
         sqlu"drop table #$typeTableName;".first
 
+      // `text` might be a more natural choice than `varchar`, but it seems
+      // to cause problems in other parts of the code.
+      // So, we have this hack where we assume no type strings will be longer
+      // than 10k characters.
       sqlu"create table #$typeTableName(keyType varchar(10000) not null, valueType varchar(10000) not null);".first
 
       val aString = implicitly[FastTypeTag[A]].tpe.toString

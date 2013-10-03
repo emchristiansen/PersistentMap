@@ -77,7 +77,7 @@ PersistentMap requires no such boilerplate, for the reason scala-pickling requir
 ##A bit of commentary
 
 The implementation of PersistentMap is absurdly simple, but its utility is obvious.
-I hope a serious database project, e.g. Slick, picks up the idea.
+I hope a serious database project picks up the idea.
 
 ##Known issues
 

@@ -54,7 +54,7 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 ##PersistentMap vs Slick
 
-Slick is premier (or at least the TypeSafe-backed) database interface for Scala.
+Slick is the premier (or at least the TypeSafe-backed) database interface for Scala.
 Like PersistentMap, Slick provides type-safety.
 However, Slick requires some boilerplate when defining tables, especially when the table stores records of an existing type.
 PersistentMap requires no such boilerplate, for the reason scala-pickling requires no boilerplate.
@@ -72,6 +72,8 @@ I've had luck with MariaDB.
 * Unless you have MySQL set up the way Travis CI expects, the MySQL tests will fail.
 Travis CI's MySQL environment is explained here: http://about.travis-ci.org/docs/user/database-setup/.
 * The table typechecking currently uses runtime reflection, which has documented thread safety issues.
+For this reason, table typechecking currently lives in a synchronized block.
+Hopefully this solves the issue, though in my experience unexpected things can happen with concurrent runtime reflection.
 
 ##License
 

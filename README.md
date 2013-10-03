@@ -47,7 +47,7 @@ otherMap += Foo(10) -> Bar(List(Foo(1), Foo(2)), "hello")
 ```
 
 As demonstrated in the above code, scala-pickling can handle existing case classes, but it is by no means limited to that.
-See Heather Miller's [talk](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a/chapter0/about) ([slides](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a/chapter0/about)) for more information.
+See Heather Miller's [talk](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a/chapter0/about) ([slides](https://speakerdeck.com/heathermiller/on-pickles-and-spores-improving-support-for-distributed-programming-in-scala)) for more information.
 
 For more detailed information on using PersistentMap, see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests.
 

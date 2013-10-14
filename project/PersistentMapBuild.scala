@@ -37,7 +37,7 @@ object PersistentMapBuild extends Build {
 
     pomExtra := (
       <scm>
-        <url>git@github.com:emchristiansne/PersistentMap.git</url>
+        <url>git@github.com:emchristiansen/PersistentMap.git</url>
         <connection>scm:git:git@github.com:emchristiansen/PersistentMap.git</connection>
       </scm>
       <developers>

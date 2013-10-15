@@ -4,8 +4,8 @@ import Keys._
 object PersistentMapBuild extends Build {
   def extraResolvers = Seq(
     resolvers ++= Seq(
-      "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-      "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"))
+      Resolver.sonatypeRepo("releases"),
+      Resolver.sonatypeRepo("snapshots")))
 
   val projectName = "PersistentMap"
   val mavenName = "persistent-map"
@@ -48,7 +48,7 @@ object PersistentMapBuild extends Build {
         </developer>
       </developers>))
 
-  val scalaVersionString = "2.10.3"
+  val scalaVersionString = "2.10.3-RC2"
 
   def extraLibraryDependencies = Seq(
     libraryDependencies ++= Seq(

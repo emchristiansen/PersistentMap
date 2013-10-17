@@ -48,7 +48,7 @@ object PersistentMapBuild extends Build {
         </developer>
       </developers>))
 
-  val scalaVersionString = "2.10.3-RC2"
+  val scalaVersionString = "2.10.3"
 
   def extraLibraryDependencies = Seq(
     libraryDependencies ++= Seq(
@@ -77,6 +77,7 @@ object PersistentMapBuild extends Build {
       "-feature",
       "-language:implicitConversions",
       "-language:existentials",
+//      "-Xlog-implicits",
       // "-language:reflectiveCalls",
       "-language:postfixOps"))
 

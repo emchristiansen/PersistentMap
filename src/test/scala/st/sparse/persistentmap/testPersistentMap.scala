@@ -20,14 +20,16 @@ case class Derived(val x: Int) extends Base(x)
 class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   // Creates a MySQL database, backed by some random temporary file.
   def createSQLiteDatabase = {
-    val tempFile = File.createTempFile("testPersistentMapDB", "sqlite")
-    Database.forURL(s"jdbc:sqlite:$tempFile", driver = "org.sqlite.JDBC")
+    val tempFile = File.createTempFile("testPersistentMapDB", ".sqlite")
+    ConnectionHelper.databaseSQLite(tempFile)
   }
 
   // This will only work in a Travis CI environment.
-  def createMySQLDatabase = Database.forURL(
-    "jdbc:mysql://localhost/myapp_test?user=travis&password=",
-    driver = "com.mysql.jdbc.Driver")
+  def createMySQLDatabase = ConnectionHelper.databaseMySQL(
+    "localhost",
+    "myapp_test",
+    "travis",
+    "")
 
   test("SQLite: sample code") {
     val database: scala.slick.session.Database = createSQLiteDatabase
@@ -102,7 +104,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   test("MySQL: test the core Map api with sample data") {
     run0(createMySQLDatabase)
   }
-  
+
   def run1(database: Database) {
     PersistentMap.create[Int, Double]("test", database)
 
@@ -124,7 +126,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   test("SQLite: basic table connection time type safety") {
     run1(createSQLiteDatabase)
   }
-  
+
   test("MySQL: basic table connection time type safety") {
     run1(createMySQLDatabase)
   }
@@ -145,7 +147,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   test("SQLite: table connection time type safety with subclasses") {
     run2(createSQLiteDatabase)
   }
-  
+
   test("MySQL: table connection time type safety with subclasses") {
     run2(createMySQLDatabase)
   }

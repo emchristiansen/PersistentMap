@@ -59,7 +59,7 @@ private object PersistentMapImplicits {
 class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
   database: Database,
   typeTableName: String,
-  recordsTableName: String) extends collection.mutable.Map[A, B] {
+  recordsTableName: String) extends collection.mutable.Map[A, B] with Logging {
   import PersistentMapImplicits._
 
   // These implicits are required to unpack results from SQL queries
@@ -70,8 +70,8 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
   private implicit val getKeyValueRecordResult =
     GetResult(r => KeyValueRecord(
       r.nextInt,
-      BinaryPickle(r.nextBytes).unpickle[A],
-      BinaryPickle(r.nextBytes).unpickle[B]))
+      logUnpickle[A](logger, BinaryPickle(r.nextBytes)),
+      logUnpickle[B](logger, BinaryPickle(r.nextBytes))))
 
   // Do consistency checks on the two backing tables.
   // The properties checked here are assumed to be invariant throughout
@@ -95,7 +95,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       // To check for a subtype relationship, we simply attempt to compile
       // some indicator code.
       // Compilation succeeds iff the subtype relationship holds.
-      val baseString = implicitly[FastTypeTag[Base]].tpe.toString
+      val baseString = typeName[Base]
       val code = s"(x: $derived) => x: $baseString"
 
       RuntimeReflectionLock.synchronized {
@@ -169,7 +169,10 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       this -= key
 
       // Then we insert our new record.
-      sqlu"insert into #$recordsTableName values(${hashKey(key)}, ${key.pickle.value}, ${value.pickle.value});".first
+
+      val keyBytes = logPickle(logger, key).value
+      val valueBytes = logPickle(logger, value).value
+      sqlu"insert into #$recordsTableName values(${hashKey(key)}, $keyBytes, $valueBytes);".first
     }
 
     this
@@ -177,7 +180,8 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
 
   override def -=(key: A): this.type = {
     database withSession { implicit session: Session =>
-      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = ${key.pickle.value};".first
+      val keyBytes = logPickle(logger, key).value      
+      sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = $keyBytes;".first
     }
 
     this
@@ -217,8 +221,8 @@ object PersistentMap {
       // than 10k characters.
       sqlu"create table #$typeTableName(keyType varchar(10000) not null, valueType varchar(10000) not null);".first
 
-      val aString = implicitly[FastTypeTag[A]].tpe.toString
-      val bString = implicitly[FastTypeTag[B]].tpe.toString
+      val aString = typeName[A]
+      val bString = typeName[B]
       sqlu"insert into #$typeTableName values($aString, $bString);".first
 
       // Initialize the records table.

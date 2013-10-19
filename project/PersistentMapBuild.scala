@@ -57,6 +57,7 @@ object PersistentMapBuild extends Build {
       "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT",
       "joda-time" % "joda-time" % "2.3",
       "org.joda" % "joda-convert" % "1.5",
+      "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
       "org.xerial" % "sqlite-jdbc" % "3.7.2" % "test",
 //      "org.jumpmind.symmetric.jdbc" % "mariadb-java-client" % "1.1.1" % "test",
       "mysql" % "mysql-connector-java" % "5.1.6" % "test",

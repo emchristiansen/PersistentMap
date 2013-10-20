@@ -9,6 +9,7 @@ import StaticQuery.interpolation
 import scala.slick.jdbc.meta.MTable
 import scala.slick.session.PositionedParameters
 import scala.slick.session.PositionedResult
+import internal._
 
 // This is used to encode the type of a `PersistentMap` in a table.
 private case class TypeRecord(keyType: String, valueType: String)

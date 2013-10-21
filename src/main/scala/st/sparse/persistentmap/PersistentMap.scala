@@ -74,17 +74,26 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
       logUnpickle[A](logger, BinaryPickle(r.nextBytes)),
       logUnpickle[B](logger, BinaryPickle(r.nextBytes))))
 
+  /**
+   * The names of the key and value types stored in the database.
+   * These may be more specific than the types `A` and `B` in the persistent
+   * map, since we allow subclassing. 
+   */
+  val (keyTypeString, valueTypeString) =
+    database withSession { implicit session: Session =>
+      // The type table:
+      // 1) must exist,
+      require(MTable.getTables(typeTableName).list().size == 1)
+      val entries = sql"select * from #$typeTableName;".as[TypeRecord].list
+      // 2) must have exactly one entry,
+      require(entries.size == 1)
+      (entries.head.keyType, entries.head.valueType)
+    }
+
   // Do consistency checks on the two backing tables.
   // The properties checked here are assumed to be invariant throughout
   // the existence of this map.
   database withSession { implicit session: Session =>
-    // The type table:
-    // 1) must exist,
-    require(MTable.getTables(typeTableName).list().size == 1)
-    val entries = sql"select * from #$typeTableName;".as[TypeRecord].list
-    // 2) must have exactly one entry,
-    require(entries.size == 1)
-
     // Asserts `derived` is a subtype of `Base`, where `Base` is an
     // actual type, and `derived` is a string representing a type.
     // This uses runtime reflection, which is probably not the best solution,
@@ -118,9 +127,9 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
 
     }
 
-    // 3) and that entry must reflect the required type.
-    assertSubtype[A](entries.head.keyType, "key")
-    assertSubtype[B](entries.head.valueType, "value")
+    // The type table entries must reflect the required type.
+    assertSubtype[A](keyTypeString, "key")
+    assertSubtype[B](valueTypeString, "value")
 
     // The records table must exist.
     require(MTable.getTables(recordsTableName).list().size == 1)
@@ -181,7 +190,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
 
   override def -=(key: A): this.type = {
     database withSession { implicit session: Session =>
-      val keyBytes = logPickle(logger, key).value      
+      val keyBytes = logPickle(logger, key).value
       sqlu"delete from #$recordsTableName where keyHash = ${hashKey(key)} and keyData = $keyBytes;".first
     }
 

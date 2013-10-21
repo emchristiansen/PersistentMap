@@ -16,6 +16,10 @@ case class MyValue(a: MyKey, b: Double)
 class Base(val y: Int)
 case class Derived(val x: Int) extends Base(x)
 
+object MyObject {
+  object MyInnerObject
+}
+
 @RunWith(classOf[JUnitRunner])
 class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
   // Creates a MySQL database, backed by some random temporary file.

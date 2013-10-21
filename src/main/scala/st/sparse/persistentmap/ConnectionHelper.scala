@@ -16,7 +16,7 @@ object ConnectionHelper {
 
   def jdbcURLMySQL: (String, String, String, String) => String =
     (hostAndPort, database, user, password) =>
-      s"jdbc:mysql://$hostAndPort/$database?user=$user&password=&password"
+      s"jdbc:mysql://$hostAndPort/$database?user=$user&password=$password"
   def driverStringMySQL: String = "com.mysql.jdbc.Driver"
   def databaseMySQL: (String, String, String, String) => Database = {
     case args =>
@@ -27,7 +27,7 @@ object ConnectionHelper {
 
   def jdbcURLMariaDB: (String, String, String, String) => String =
     (hostAndPort, database, user, password) =>
-      s"jdbc:mariadb://$hostAndPort/$database?user=$user&password=&password"
+      s"jdbc:mariadb://$hostAndPort/$database?user=$user&password=$password"
   def driverStringMariaDB: String = "org.mariadb.jdbc.Driver"
   def databaseMariaDB: (String, String, String, String) => Database = {
     case args =>

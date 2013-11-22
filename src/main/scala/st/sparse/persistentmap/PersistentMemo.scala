@@ -22,7 +22,8 @@ object PersistentMemo {
     function: A => B)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],
       ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMemo[A, B] = {
-    val persistentMap = PersistentMap.connectElseCreate[A, B](name, database)
+    val mapName = name + "Memo"
+    val persistentMap = PersistentMap.connectElseCreate[A, B](mapName, database)
     new PersistentMemo(function, persistentMap)
   }
 }

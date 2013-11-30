@@ -33,23 +33,45 @@ class TestPersistentMemo extends FunSuite with GeneratorDrivenPropertyChecks {
       count += 1
       string.size
     }
-    
+
     val memo = PersistentMemo(database, "sideEffectFoo", sideEffectFoo _)
-    
+
     assert(memo("abcd") == 4)
     // Not memoized, so should increment count.
     assert(count == 1)
-    
+
     assert(memo("hi") == 2)
     // Not memoized, so should increment count.
     assert(count == 2)
-    
+
     assert(memo("abcd") == 4)
     // Memoized, so should not increment count.
     assert(count == 2)
-    
+
     assert(memo("ah") == 2)
     // Not memoized, so should increment count.
     assert(count == 3)
+  }
+
+  test("reconnection test") {
+    val database: scala.slick.session.Database = createSQLiteDatabase
+
+    var count = 0
+    def sideEffectFoo(string: String): Int = {
+      count += 1
+      string.size
+    }
+    
+    val memo1 = PersistentMemo(database, "reconnectionTest", sideEffectFoo _)
+    
+    assert(memo1("abcd") == 4)
+    // Not memoized, so should increment count.
+    assert(count == 1)
+    
+    val memo2 = PersistentMemo(database, "reconnectionTest", sideEffectFoo _)
+    
+    assert(memo2("abcd") == 4)
+    // Memoized, so should not increment count.
+    assert(count == 1)
   }
 }

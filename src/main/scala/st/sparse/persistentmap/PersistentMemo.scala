@@ -4,15 +4,24 @@ import scala.slick.session.Database
 import scala.pickling.Unpickler
 import scala.pickling.FastTypeTag
 import scala.pickling.SPickler
+import st.sparse.persistentmap.internal.Logging
 
+// TODO: Move thread safety into PersistentMap.
 class PersistentMemo[A, B] private (
   function: A => B,
-  persistentMap: PersistentMap[A, B]) extends (A => B) {
-  override def apply(a: A): B = persistentMap.getOrElse(a, {
-    val b = function(a)
-    persistentMap += a -> b
-    b
-  })
+  persistentMap: PersistentMap[A, B]) extends (A => B) with Logging {
+  override def apply(a: A): B = PersistentMemo.synchronized {
+    persistentMap.get(a) match {
+      case Some(b) =>
+        logger.debug(s"PersistentMemo hit: $a => $b")
+        b
+      case None =>
+        val b = function(a)
+        logger.debug(s"PersistentMemo miss: $a => $b")
+        persistentMap += a -> b
+        b
+    }
+  }
 }
 
 object PersistentMemo {
@@ -21,9 +30,11 @@ object PersistentMemo {
     name: String,
     function: A => B)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],
-      ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMemo[A, B] = {
-    val mapName = name + "Memo"
-    val persistentMap = PersistentMap.connectElseCreate[A, B](mapName, database)
-    new PersistentMemo(function, persistentMap)
-  }
+      ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMemo[A, B] =
+    // TODO: Move thread safety into PersistentMap.
+    PersistentMemo.synchronized {
+      val mapName = name + "Memo"
+      val persistentMap = PersistentMap.connectElseCreate[A, B](mapName, database)
+      new PersistentMemo(function, persistentMap)
+    }
 }

@@ -5,7 +5,8 @@ object PersistentMapBuild extends Build {
   def extraResolvers = Seq(
     resolvers ++= Seq(
       Resolver.sonatypeRepo("releases"),
-      Resolver.sonatypeRepo("snapshots")))
+      Resolver.sonatypeRepo("snapshots"),
+      "spray" at "http://repo.spray.io/"))
 
   val projectName = "PersistentMap"
   val mavenName = "persistent-map"
@@ -54,6 +55,7 @@ object PersistentMapBuild extends Build {
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersionString,
       "com.typesafe.slick" %% "slick" % "1.0.1",
+      "io.spray" %%  "spray-json" % "1.2.5",
       "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT",
       "joda-time" % "joda-time" % "2.3",
       "org.joda" % "joda-convert" % "1.5",

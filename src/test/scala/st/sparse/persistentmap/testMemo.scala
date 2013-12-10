@@ -11,7 +11,7 @@ import scala.slick.session.Database
 import java.io.File
 
 @RunWith(classOf[JUnitRunner])
-class TestPersistentMemo extends FunSuite with GeneratorDrivenPropertyChecks {
+class TestMemo extends FunSuite with GeneratorDrivenPropertyChecks {
   // Creates a MySQL database, backed by some random temporary file.
   def createSQLiteDatabase = {
     val tempFile = File.createTempFile("testPersistentMapDB", ".sqlite")
@@ -34,7 +34,7 @@ class TestPersistentMemo extends FunSuite with GeneratorDrivenPropertyChecks {
       string.size
     }
 
-    val memo = PersistentMemo(database, "sideEffectFoo", sideEffectFoo _)
+    val memo = Memo.create("sideEffectFoo", database, sideEffectFoo _)
 
     assert(memo("abcd") == 4)
     // Not memoized, so should increment count.
@@ -61,15 +61,16 @@ class TestPersistentMemo extends FunSuite with GeneratorDrivenPropertyChecks {
       count += 1
       string.size
     }
-    
-    val memo1 = PersistentMemo(database, "reconnectionTest", sideEffectFoo _)
-    
+
+    val memo1 = Memo.create("reconnectionTest", database, sideEffectFoo _)
+
     assert(memo1("abcd") == 4)
     // Not memoized, so should increment count.
     assert(count == 1)
-    
-    val memo2 = PersistentMemo(database, "reconnectionTest", sideEffectFoo _)
-    
+
+    val memo2 =
+      Memo.connectElseCreate("reconnectionTest", database, sideEffectFoo _)
+
     assert(memo2("abcd") == 4)
     // Memoized, so should not increment count.
     assert(count == 1)

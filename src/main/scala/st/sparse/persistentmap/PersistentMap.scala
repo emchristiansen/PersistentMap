@@ -57,7 +57,7 @@ private object PersistentMapImplicits {
  * _These tables must already exist_; see `PersistentMap.create`
  * to create a new map.
  */
-class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
+case class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
   database: Database,
   typeTableName: String,
   recordsTableName: String) extends collection.mutable.Map[A, B] with Logging {
@@ -77,7 +77,7 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
   /**
    * The names of the key and value types stored in the database.
    * These may be more specific than the types `A` and `B` in the persistent
-   * map, since we allow subclassing. 
+   * map, since we allow subclassing.
    */
   val (keyTypeString, valueTypeString) =
     database withSession { implicit session: Session =>
@@ -198,62 +198,70 @@ class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler:
   }
 }
 
-object PersistentMap {
+case object PersistentMap {
   private def typeTable(name: String): String = name + "TypeTable"
   private def recordsTable(name: String): String = name + "RecordsTable"
   private def recordsTableIndex(name: String): String =
     name + "RecordsTableIndex"
 
+  // Things might be weird if we try to create the same table simultaneously
+  // in a few threads.
+  // Plus for now we have to synchronize for reflection, so there's no
+  // performance loss.
+  private object CreateLock
+
   /**
-   * Creates a new map.
+   * Destructively creates a new map.
    *
    * If another map of the same name already exists, this will clobber it.
+   * If you want to keep any existing data, use `connectElseCreate`.
    */
   def create[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
     name: String,
     database: Database)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],
-      ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMap[A, B] = {
-    import PersistentMapImplicits._
+      ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMap[A, B] =
+    CreateLock.synchronized {
+      import PersistentMapImplicits._
 
-    val typeTableName = typeTable(name)
-    val recordsTableName = recordsTable(name)
-    val recordsTableIndexName = recordsTableIndex(name)
+      val typeTableName = typeTable(name)
+      val recordsTableName = recordsTable(name)
+      val recordsTableIndexName = recordsTableIndex(name)
 
-    database withSession { implicit session: Session =>
-      // Initialize the type table.      
-      if (!MTable.getTables(typeTableName).elements.isEmpty)
-        sqlu"drop table #$typeTableName;".first
+      database withSession { implicit session: Session =>
+        // Initialize the type table.      
+        if (!MTable.getTables(typeTableName).elements.isEmpty)
+          sqlu"drop table #$typeTableName;".first
 
-      // `text` might be a more natural choice than `varchar`, but it seems
-      // to cause problems in other parts of the code.
-      // So, we have this hack where we assume no type strings will be longer
-      // than 10k characters.
-      sqlu"create table #$typeTableName(keyType varchar(10000) not null, valueType varchar(10000) not null);".first
+        // `text` might be a more natural choice than `varchar`, but it seems
+        // to cause problems in other parts of the code.
+        // So, we have this hack where we assume no type strings will be longer
+        // than 10k characters.
+        sqlu"create table #$typeTableName(keyType varchar(10000) not null, valueType varchar(10000) not null);".first
 
-      val aString = typeName[A]
-      val bString = typeName[B]
-      sqlu"insert into #$typeTableName values($aString, $bString);".first
+        val aString = typeName[A]
+        val bString = typeName[B]
+        sqlu"insert into #$typeTableName values($aString, $bString);".first
 
-      // Initialize the records table.
-      if (!MTable.getTables(recordsTableName).elements.isEmpty) {
-        // We assume the index also exists, so we delete it as well.
-        // In fact, we delete it first, otherwise it would be dangling at some
-        // point, and something crazy might happen.
-        sqlu"drop index #$recordsTableIndexName on #$recordsTableName;".first
-        sqlu"drop table #$recordsTableName;".first
+        // Initialize the records table.
+        if (!MTable.getTables(recordsTableName).elements.isEmpty) {
+          // We assume the index also exists, so we delete it as well.
+          // In fact, we delete it first, otherwise it would be dangling at some
+          // point, and something crazy might happen.
+          sqlu"drop index #$recordsTableIndexName on #$recordsTableName;".first
+          sqlu"drop table #$recordsTableName;".first
+        }
+
+        // We want to do quick lookups using the key hash, but we can't make it
+        // a primary key due to the possibility of hash collisions.
+        // Instead, we build an index on the key hash.
+        sqlu"create table #$recordsTableName(keyHash int not null, keyData blob not null, valueData blob not null);".first
+        sqlu"create index #$recordsTableIndexName on #$recordsTableName(keyHash);".first
       }
 
-      // We want to do quick lookups using the key hash, but we can't make it
-      // a primary key due to the possibility of hash collisions.
-      // Instead, we build an index on the key hash.
-      sqlu"create table #$recordsTableName(keyHash int not null, keyData blob not null, valueData blob not null);".first
-      sqlu"create index #$recordsTableIndexName on #$recordsTableName(keyHash);".first
+      // Build the final map.
+      new PersistentMap[A, B](database, typeTableName, recordsTableName)
     }
-
-    // Build the final map.
-    new PersistentMap[A, B](database, typeTableName, recordsTableName)
-  }
 
   /**
    * Attempts to connect to an existing map, returning None on failure.
@@ -283,6 +291,10 @@ object PersistentMap {
     }
   }
 
+  // Without this lock, we might create the same table several times, possibly
+  // losing data written in the interim.
+  private object ConnectElseCreateLock
+
   /**
    * Attempts to connect to a map, and if it fails, creates a new map.
    */
@@ -291,5 +303,7 @@ object PersistentMap {
     database: Database)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],
       ftt2b: FastTypeTag[FastTypeTag[B]]): PersistentMap[A, B] =
-    connect[A, B](name, database).getOrElse(create[A, B](name, database))
+    ConnectElseCreateLock.synchronized {
+      connect[A, B](name, database).getOrElse(create[A, B](name, database))
+    }
 }

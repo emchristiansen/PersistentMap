@@ -6,7 +6,7 @@ import scala.slick.session.Database
 import scala.pickling.FastTypeTag
 
 /**
- * A PersistentMap which uses spray-json to do the bulk of the serialization,
+ * A `PersistentMap` which uses spray-json to do the bulk of the serialization,
  * leaving only string serialization to scala-pickling.
  *
  * This is useful for when scala-pickling isn't working properly; as a
@@ -40,6 +40,11 @@ class PersistentJsonMap[A: JsonFormat, B: JsonFormat] private (
 }
 
 object PersistentJsonMap {
+  // We lose connection-time type safety when we use JSON as the underlying
+  // representation.
+  // This could mean we might try to deserialize some JSON into something it's
+  // not; like an unsafe cast in C, this could cause weird and bad behavior.
+  // For this reason, we're salting the table name with the type info.
   private def appendTypeInfo[A: FastTypeTag, B: FastTypeTag](
     name: String): String = {
     val a = typeName[A].filter(_.isLetterOrDigit)

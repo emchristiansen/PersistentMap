@@ -51,6 +51,16 @@ See Heather Miller's [talk](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a
 
 For more detailed information on using PersistentMap, see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests.
 
+###Update 9 December 2013
+
+The library now includes two additional classes:
+* `PersistentJsonMap` allows you to use spray-json for serialization.
+This is useful for those cases in which scala-pickling still fails.
+* `Memo` provides function memoization using a mutable map you provide.
+You can get persistent memoization by using a persistent map.
+You can also control the scope of the memoization (e.g. global vs local) through the selection of the underlying database table.
+If you want global memoization but don't want persistence, just use an in-memory database.
+
 ##Installation
 
 You can use PersistentMap in your SBT project by simply adding the following dependency to your build file:

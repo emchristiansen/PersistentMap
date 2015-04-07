@@ -14,7 +14,7 @@ object PersistentMapBuild extends Build {
   val publishSettings = Seq(
     name := mavenName,
 
-    version := "0.1.2-SNAPSHOT",
+    version := "0.1.3-SNAPSHOT",
 
     organization := "st.sparse",
 
@@ -49,24 +49,25 @@ object PersistentMapBuild extends Build {
         </developer>
       </developers>))
 
-  val scalaVersionString = "2.10.3"
+  val scalaVersionString = "2.11.6"
 
   def extraLibraryDependencies = Seq(
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersionString,
-      "com.typesafe.slick" %% "slick" % "1.0.1",
-      "io.spray" %%  "spray-json" % "1.2.5",
-      "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT",
-      "joda-time" % "joda-time" % "2.3",
-      "org.joda" % "joda-convert" % "1.5",
-      "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
-      "org.xerial" % "sqlite-jdbc" % "3.7.2" % "test",
+      "com.typesafe.slick" %% "slick" % "2.1.0",
+      "io.spray" %%  "spray-json" % "1.3.1",
+			"org.scala-lang.modules" %% "scala-pickling" % "0.10.0",
+      "joda-time" % "joda-time" % "2.7",
+      "org.joda" % "joda-convert" % "1.7",
+      // "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
+			"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+      "org.xerial" % "sqlite-jdbc" % "3.8.7" % "test",
 //      "org.jumpmind.symmetric.jdbc" % "mariadb-java-client" % "1.1.1" % "test",
-      "mysql" % "mysql-connector-java" % "5.1.6" % "test",
-      "org.slf4j" % "slf4j-nop" % "1.6.4" % "test",
-      "org.scalatest" %% "scalatest" % "2.0.M5b" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.10.1" % "test",
-      "junit" % "junit" % "4.11" % "test"))
+      "mysql" % "mysql-connector-java" % "5.1.35" % "test",
+      "org.slf4j" % "slf4j-nop" % "1.7.12" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.0-SNAP4" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
+      "junit" % "junit" % "4.12" % "test"))
 
   def updateOnDependencyChange = Seq(
     watchSources <++= (managedClasspath in Test) map { cp => cp.files })

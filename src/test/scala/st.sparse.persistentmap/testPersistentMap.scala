@@ -1,19 +1,15 @@
 package st.sparse.persistentmap
 
+import java.io.File
+
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.FunSuite
-import org.scalacheck.Gen
-import scala.pickling._
-import scala.pickling.binary._
-import scala.pickling._
-import scala.pickling.binary._
-import scala.pickling.static._
+
 import scala.pickling.Defaults._
-import slick.jdbc.JdbcBackend.Database
-import slick.jdbc.JdbcBackend.Session
-import java.io.File
+import scala.pickling._
+import scala.slick.jdbc.JdbcBackend.Database
 
 case class MyKey(a: Int, b: String)
 case class MyValue(a: MyKey, b: Double)

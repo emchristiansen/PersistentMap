@@ -1,11 +1,9 @@
 package st.sparse.persistentmap
 
-import scala.slick.util.SlickLogger
-
+import scala.pickling.Defaults._
 import scala.pickling._
 import scala.pickling.binary._
-import scala.pickling.static._
-import scala.pickling.Defaults._
+import scala.slick.util.SlickLogger
 
 package object internal {
 //  type Logging = com.typesafe.scalalogging.slf4j.Logging

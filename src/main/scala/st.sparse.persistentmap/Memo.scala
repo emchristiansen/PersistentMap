@@ -1,14 +1,10 @@
 package st.sparse.persistentmap
 
-import scala.pickling._
-import scala.pickling.binary._
-import scala.pickling.static._
-import scala.pickling.Defaults._
-import slick.jdbc.JdbcBackend.Database
-import slick.jdbc.JdbcBackend.Session
-import scala.pickling._
-import st.sparse.persistentmap.internal.Logging
 import spray.json._
+import st.sparse.persistentmap.internal.Logging
+
+import scala.pickling._
+import scala.slick.jdbc.JdbcBackend.Database
 
 /**
  * A function memoizer which can use `PersistentMap` for global, persistent

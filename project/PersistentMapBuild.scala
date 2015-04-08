@@ -1,5 +1,5 @@
+import sbt.Keys._
 import sbt._
-import Keys._
 
 object PersistentMapBuild extends Build {
   def extraResolvers = Seq(
@@ -59,8 +59,6 @@ object PersistentMapBuild extends Build {
 			"org.scala-lang.modules" %% "scala-pickling" % "0.10.0",
       "joda-time" % "joda-time" % "2.7",
       "org.joda" % "joda-convert" % "1.7",
-      // "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
-//			"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
       "org.xerial" % "sqlite-jdbc" % "3.8.7" % "test",
 //      "org.jumpmind.symmetric.jdbc" % "mariadb-java-client" % "1.1.1" % "test",
       "mysql" % "mysql-connector-java" % "5.1.35" % "test",

@@ -1,11 +1,11 @@
 package st.sparse.persistentmap
 
-import st.sparse.persistentmap.internal._
 import spray.json._
-import slick.jdbc.JdbcBackend.Database
-import scala.pickling._
-import scala.pickling.static._
+import st.sparse.persistentmap.internal._
+
 import scala.pickling.Defaults._
+import scala.pickling._
+import scala.slick.jdbc.JdbcBackend.Database
 
 /**
  * A `PersistentMap` which uses spray-json to do the bulk of the serialization,

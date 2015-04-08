@@ -81,7 +81,7 @@ object PersistentMapBuild extends Build {
       "-feature",
       "-language:implicitConversions",
       "-language:existentials",
-//      "-Xlog-implicits",
+      "-Xlog-implicits",
       // "-language:reflectiveCalls",
       "-language:postfixOps"))
 

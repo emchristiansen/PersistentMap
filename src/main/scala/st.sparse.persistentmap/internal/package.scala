@@ -1,9 +1,11 @@
 package st.sparse.persistentmap
 
-import org.slf4j.Logger
+import scala.slick.util.SlickLogger
 
 import scala.pickling._
 import scala.pickling.binary._
+import scala.pickling.static._
+import scala.pickling.Defaults._
 
 package object internal {
 //  type Logging = com.typesafe.scalalogging.slf4j.Logging
@@ -12,15 +14,15 @@ package object internal {
   def typeName[A: FastTypeTag] =
     implicitly[FastTypeTag[A]].tpe.toString
 
-  def logPickle[A: SPickler: FastTypeTag](
-    logger: Logger,
+  def logPickle[A: Pickler: FastTypeTag](
+    logger: SlickLogger,
     a: A) = {
     logger.debug(s"Pickling ${typeName[A]}.")
     a.pickle
   }
 
   def logUnpickle[A: Unpickler: FastTypeTag](
-    logger: Logger,
+    logger: SlickLogger,
     pickle: BinaryPickle): A = {
     logger.debug(s"Unpickling ${typeName[A]}.")
     pickle.unpickle[A]

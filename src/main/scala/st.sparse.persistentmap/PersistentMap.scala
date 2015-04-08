@@ -61,7 +61,7 @@ private object PersistentMapImplicits {
  * _These tables must already exist_; see `PersistentMap.create`
  * to create a new map.
  */
-case class PersistentMap[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
+case class PersistentMap[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickler: FastTypeTag](
   database: Database,
   typeTableName: String,
   recordsTableName: String) extends collection.mutable.Map[A, B] with Logging {
@@ -270,7 +270,7 @@ case object PersistentMap {
   /**
    * Attempts to connect to an existing map, returning None on failure.
    */
-  def connect[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
+  def connect[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickler: FastTypeTag](
     name: String,
     database: Database)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],
@@ -302,7 +302,7 @@ case object PersistentMap {
   /**
    * Attempts to connect to a map, and if it fails, creates a new map.
    */
-  def connectElseCreate[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
+  def connectElseCreate[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickler: FastTypeTag](
     name: String,
     database: Database)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],

@@ -1,6 +1,6 @@
 language: scala
 scala:
-   - 2.10.2
+   - 2.11.6
 jdk:
    - oraclejdk7
 before_script:

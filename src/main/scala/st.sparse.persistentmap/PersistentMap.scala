@@ -1,14 +1,13 @@
 package st.sparse.persistentmap
 
+import st.sparse.persistentmap.internal._
+
 import scala.pickling._
 import scala.pickling.binary._
-import scala.pickling.static._
+import scala.slick.jdbc.JdbcBackend.{Database, Session}
+import scala.slick.jdbc.StaticQuery.interpolation
 import scala.slick.jdbc._
-import StaticQuery.interpolation
 import scala.slick.jdbc.meta.MTable
-import internal._
-import slick.jdbc.JdbcBackend.Database
-import slick.jdbc.JdbcBackend.Session
 
 
 // This is used to encode the type of a `PersistentMap` in a table.

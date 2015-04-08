@@ -12,26 +12,23 @@ import scala.pickling._
 import scala.pickling.binary._
 import scala.slick.session.Database
 import st.sparse.persistentmap._
-// Optionally include workarounds for a few cases where scala-pickling
-// currently fails.
-// import CustomPicklers._
 
 val database: scala.slick.session.Database = ...
-    
+
 // Create a `PersistentMap`.
 // Of course, you can also connect to an existing one.
 val map = PersistentMap.create[Int, String]("myMap", database)
-    
+
 // Add key-value pairs.
 map += 1 -> "no"
 map += 2 -> "boilerplate"
-    
+
 // Retrieve values.
 assert(map(1) == "no")
-    
+
 // Delete key-value pairs.
 map -= 2
-    
+
 // And do anything else supported by `collection.mutable.Map`.
 ...
 
@@ -42,7 +39,7 @@ case class Foo(int: Int)
 case class Bar(foos: List[Foo], string: String)
 
 val otherMap = PersistentMap.create[Foo, Bar]("myOtherMap", database)
-  
+
 otherMap += Foo(10) -> Bar(List(Foo(1), Foo(2)), "hello")
 ```
 
@@ -66,7 +63,7 @@ If you want global memoization but don't want persistence, just use an in-memory
 You can use PersistentMap in your SBT project by simply adding the following dependency to your build file:
 
 ```scala
-libraryDependencies += "st.sparse" %% "persistent-map" % "0.1-SNAPSHOT"
+libraryDependencies += "st.sparse" %% "persistent-map" % "0.1.3-SNAPSHOT"
 ```
 
 You also need to add the Sonatype "snapshots" repository resolver to your build file:
@@ -103,4 +100,3 @@ Hopefully this solves the issue, though in my experience unexpected things can h
 ##License
 
 MIT / I don't care
-

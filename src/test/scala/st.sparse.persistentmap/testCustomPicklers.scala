@@ -9,8 +9,6 @@ import scala.pickling._
 import scala.pickling.binary._
 import org.joda.time._
 
-import CustomPicklers._
-
 @RunWith(classOf[JUnitRunner])
 class TestCustomPicklers extends FunSuite with GeneratorDrivenPropertyChecks {
   test("pickle DateTime") {

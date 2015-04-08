@@ -2,7 +2,7 @@ package st.sparse.persistentmap
 
 import st.sparse.persistentmap.internal._
 import spray.json._
-import scala.slick.session.Database
+import slick.jdbc.JdbcBackend.Database
 import scala.pickling.FastTypeTag
 
 /**

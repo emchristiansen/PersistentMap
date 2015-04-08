@@ -1,11 +1,13 @@
 package st.sparse.persistentmap
 
+import org.slf4j.Logger
+
 import scala.pickling._
 import scala.pickling.binary._
-import com.typesafe.scalalogging.slf4j.Logger
 
 package object internal {
-  type Logging = com.typesafe.scalalogging.slf4j.Logging
+//  type Logging = com.typesafe.scalalogging.slf4j.Logging
+  type Logging = scala.slick.util.Logging
 
   def typeName[A: FastTypeTag] =
     implicitly[FastTypeTag[A]].tpe.toString

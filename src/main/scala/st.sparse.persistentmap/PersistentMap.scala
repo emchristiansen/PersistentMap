@@ -2,14 +2,18 @@ package st.sparse.persistentmap
 
 import scala.pickling._
 import scala.pickling.binary._
-import scala.slick.session.Database
-import scala.slick.session.Session
+import scala.pickling.static._
+//import scala.slick.session.Database
+//import scala.slick.session.Session
 import scala.slick.jdbc._
-import StaticQuery.interpolation
+//import StaticQuery.interpolation
 import scala.slick.jdbc.meta.MTable
-import scala.slick.session.PositionedParameters
-import scala.slick.session.PositionedResult
+//import scala.slick.session.PositionedParameters
+//import scala.slick.session.PositionedResult
 import internal._
+import slick.jdbc.JdbcBackend.Database
+import slick.jdbc.JdbcBackend.Session
+
 
 // This is used to encode the type of a `PersistentMap` in a table.
 private case class TypeRecord(keyType: String, valueType: String)
@@ -216,7 +220,7 @@ case object PersistentMap {
    * If another map of the same name already exists, this will clobber it.
    * If you want to keep any existing data, use `connectElseCreate`.
    */
-  def create[A: SPickler: Unpickler: FastTypeTag, B: SPickler: Unpickler: FastTypeTag](
+  def create[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickler: FastTypeTag](
     name: String,
     database: Database)(
       implicit ftt2a: FastTypeTag[FastTypeTag[A]],

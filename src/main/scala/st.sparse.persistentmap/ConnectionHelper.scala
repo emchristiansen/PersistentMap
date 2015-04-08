@@ -1,7 +1,7 @@
 package st.sparse.persistentmap
 
 import java.io.File
-import scala.slick.session.Database
+import slick.jdbc.JdbcBackend.Database
 
 /**
  * Helper methods for connecting to common databases.

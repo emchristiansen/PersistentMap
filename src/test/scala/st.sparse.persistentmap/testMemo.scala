@@ -57,7 +57,7 @@ class TestMemo extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   test("reconnection test") {
-    val database: scala.slick.session.Database = createSQLiteDatabase
+    val database: Database = createSQLiteDatabase
 
     var count = 0
     def sideEffectFoo(string: String): Int = {

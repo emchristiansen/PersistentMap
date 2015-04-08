@@ -30,7 +30,7 @@ class TestPersistentJsonMap extends FunSuite with GeneratorDrivenPropertyChecks 
   implicit def myValueFormat = jsonFormat2(MyValue.apply)
 
   test("basic usage test") {
-    val database: scala.slick.session.Database = createSQLiteDatabase
+    val database: Database = createSQLiteDatabase
 
     val map = PersistentJsonMap.create[MyKey, MyValue]("test", database)
 

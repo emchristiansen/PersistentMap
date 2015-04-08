@@ -18,7 +18,7 @@ import java.io.File
 case class MyKey(a: Int, b: String)
 case class MyValue(a: MyKey, b: Double)
 
-class Base(val y: Int)
+sealed class Base(val y: Int)
 case class Derived(val x: Int) extends Base(x)
 
 object MyObject {
@@ -41,7 +41,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     "")
 
   test("SQLite: sample code") {
-    val database: scala.slick.session.Database = createSQLiteDatabase
+    val database: Database = createSQLiteDatabase
 
     // Create a `PersistentMap`.
     val map = PersistentMap.create[Int, String]("myMap", database)
@@ -148,6 +148,7 @@ class TestPersistentMap extends FunSuite with GeneratorDrivenPropertyChecks {
     assert(map1 == map2)
 
     // Retrieve the base type from a map with the derived type.
+    implicit val basePickler = Pickler.generate[Base]
     val map3 = PersistentMap.connect[Int, Base]("test", database).get
     assert((map1(42): Base).y == map3(42).y)
   }

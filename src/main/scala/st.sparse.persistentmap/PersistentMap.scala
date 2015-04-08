@@ -6,7 +6,7 @@ import scala.pickling.static._
 //import scala.slick.session.Database
 //import scala.slick.session.Session
 import scala.slick.jdbc._
-//import StaticQuery.interpolation
+import StaticQuery.interpolation
 import scala.slick.jdbc.meta.MTable
 //import scala.slick.session.PositionedParameters
 //import scala.slick.session.PositionedResult
@@ -87,7 +87,7 @@ case class PersistentMap[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickl
     database withSession { implicit session: Session =>
       // The type table:
       // 1) must exist,
-      require(MTable.getTables(typeTableName).list().size == 1)
+      require(MTable.getTables(typeTableName).iterator.size == 1)
       val entries = sql"select * from #$typeTableName;".as[TypeRecord].list
       // 2) must have exactly one entry,
       require(entries.size == 1)
@@ -136,7 +136,7 @@ case class PersistentMap[A: Pickler: Unpickler: FastTypeTag, B: Pickler: Unpickl
     assertSubtype[B](valueTypeString, "value")
 
     // The records table must exist.
-    require(MTable.getTables(recordsTableName).list().size == 1)
+    require(MTable.getTables(recordsTableName).iterator.size == 1)
 
     // We also assume the index on the records table exists, but I don't know
     // how to check for that.
@@ -234,7 +234,7 @@ case object PersistentMap {
 
       database withSession { implicit session: Session =>
         // Initialize the type table.      
-        if (!MTable.getTables(typeTableName).elements.isEmpty)
+        if (!MTable.getTables(typeTableName).iterator.isEmpty)
           sqlu"drop table #$typeTableName;".first
 
         // `text` might be a more natural choice than `varchar`, but it seems
@@ -248,7 +248,7 @@ case object PersistentMap {
         sqlu"insert into #$typeTableName values($aString, $bString);".first
 
         // Initialize the records table.
-        if (!MTable.getTables(recordsTableName).elements.isEmpty) {
+        if (!MTable.getTables(recordsTableName).iterator.isEmpty) {
           // We assume the index also exists, so we delete it as well.
           // In fact, we delete it first, otherwise it would be dangling at some
           // point, and something crazy might happen.
@@ -280,9 +280,9 @@ case object PersistentMap {
 
     database withSession { implicit session: Session =>
       val typeTableExists =
-        !MTable.getTables(typeTableName).elements.isEmpty
+        !MTable.getTables(typeTableName).iterator.isEmpty
       val recordsTableExists =
-        !MTable.getTables(recordsTableName).elements.isEmpty
+        !MTable.getTables(recordsTableName).iterator.isEmpty
 
       // Make sure either both exist or neither exists.
       // If just one exists, something funky is up.

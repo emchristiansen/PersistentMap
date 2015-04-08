@@ -7,7 +7,10 @@ import org.scalatest.FunSuite
 import org.scalacheck.Gen
 import scala.pickling._
 import scala.pickling.binary._
-import scala.slick.session.Database
+import scala.pickling.static._
+import scala.pickling.Defaults._
+import slick.jdbc.JdbcBackend.Database
+import slick.jdbc.JdbcBackend.Session
 import java.io.File
 
 @RunWith(classOf[JUnitRunner])
@@ -26,7 +29,7 @@ class TestMemo extends FunSuite with GeneratorDrivenPropertyChecks {
     "")
 
   test("easy test") {
-    val database: scala.slick.session.Database = createSQLiteDatabase
+    val database: Database = createSQLiteDatabase
 
     var count = 0
     def sideEffectFoo(string: String): Int = {

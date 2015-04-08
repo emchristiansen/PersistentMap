@@ -7,7 +7,12 @@ import org.scalatest.FunSuite
 import org.scalacheck.Gen
 import scala.pickling._
 import scala.pickling.binary._
-import scala.slick.session.Database
+import scala.pickling._
+import scala.pickling.binary._
+import scala.pickling.static._
+import scala.pickling.Defaults._
+import slick.jdbc.JdbcBackend.Database
+import slick.jdbc.JdbcBackend.Session
 import java.io.File
 import spray.json._
 import spray.json.DefaultJsonProtocol._

@@ -3,13 +3,9 @@ package st.sparse.persistentmap
 import scala.pickling._
 import scala.pickling.binary._
 import scala.pickling.static._
-//import scala.slick.session.Database
-//import scala.slick.session.Session
 import scala.slick.jdbc._
 import StaticQuery.interpolation
 import scala.slick.jdbc.meta.MTable
-//import scala.slick.session.PositionedParameters
-//import scala.slick.session.PositionedResult
 import internal._
 import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.JdbcBackend.Session

@@ -1,4 +1,4 @@
-#PersistentMap
+# PersistentMap
 
 PersistentMap is a type-safe, boilerplate-free, key-value store, built on top of [Slick](http://slick.typesafe.com/) and [scala-pickling](https://github.com/scala/pickling).
 Unlike existing key-value stores, it does not require the user to manually specify the database schema; instead, serialization is done automatically using scala-pickling.
@@ -48,7 +48,7 @@ See Heather Miller's [talk](http://www.parleys.com/play/51c3799fe4b0d38b54f4625a
 
 For more detailed information on using PersistentMap, see the [simple example project](http://github.com/emchristiansen/PersistentMapExample) or the tests.
 
-###Update 9 December 2013
+### Update 9 December 2013
 
 The library now includes two additional classes:
 * `PersistentJsonMap` allows you to use spray-json for serialization.
@@ -58,7 +58,7 @@ You can get persistent memoization by using a persistent map.
 You can also control the scope of the memoization (e.g. global vs local) through the selection of the underlying database table.
 If you want global memoization but don't want persistence, just use an in-memory database.
 
-##Installation
+## Installation
 
 You can use PersistentMap in your SBT project by simply adding the following dependency to your build file:
 
@@ -74,19 +74,19 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 [![Build Status](https://travis-ci.org/emchristiansen/PersistentMap.png)](https://travis-ci.org/emchristiansen/PersistentMap)
 
-##PersistentMap vs Slick
+## PersistentMap vs Slick
 
 Slick is the premier (or at least the TypeSafe-backed) database interface for Scala.
 Like PersistentMap, Slick provides type-safety.
 However, Slick requires some boilerplate when defining tables, especially when the table stores records of an existing type.
 PersistentMap requires no such boilerplate, for the reason scala-pickling requires no boilerplate.
 
-##A bit of commentary
+## A bit of commentary
 
 The implementation of PersistentMap is absurdly simple, but its utility is obvious.
 I hope a serious database project picks up the idea.
 
-##Known issues
+## Known issues
 
 * `org.xerial % sqlite-jdbc` is broken in OS X Mountain Lion, so the tests as written will fail in that OS.
 If you're on Mountain Lion, you'll have to use a different database.
@@ -97,6 +97,6 @@ Travis CI's MySQL environment is explained here: http://about.travis-ci.org/docs
 For this reason, table typechecking currently lives in a synchronized block.
 Hopefully this solves the issue, though in my experience unexpected things can happen with concurrent runtime reflection.
 
-##License
+## License
 
 MIT / I don't care
